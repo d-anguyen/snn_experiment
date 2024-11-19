@@ -53,4 +53,27 @@ class SNN(nn.Module):
         return torch.stack(spk_rec), torch.stack(mem_rec)
         
     
-
+class ANN(nn.Module):
+    def __init__(self, n_in=28*28, n_out=10, n_first_hidden=20, 
+                 num_binary_layers = 2, n_hidden = 10):
+        super().__init__()
+        
+        layers = [nn.Linear(n_in, n_first_hidden), nn.ReLU()]
+        
+        if num_binary_layers <2: 
+            raise Exception("Number of binary layers must be greater equal 2")
+        elif num_binary_layers == 2:
+            layers+=[nn.Linear(n_first_hidden, n_out), nn.ReLU()]
+        else:
+            layers+=[nn.Linear(n_first_hidden, n_hidden), nn.ReLU()]
+            for i in range(num_binary_layers-3):
+                layers+= [nn.Linear(n_hidden, n_hidden),nn.ReLU()]
+            layers+=[nn.Linear(n_hidden, n_out), nn.ReLU()]
+        
+        self.net = nn.Sequential(*layers)
+        
+        
+    def forward(self, x):
+        out = self.net(x.flatten(1))
+        return out
+        
