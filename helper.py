@@ -276,6 +276,7 @@ def compare_ann(variable, train_loader, test_loader, seed = None, num_epochs = 2
     trial_results = np.array(trial_results)
     
     save_path = path+ 'compare_'+variable+'_average/'
+    os.makedirs(save_path, exist_ok=True)
 
     plot_comparison(trial_results, list_x, plot_desc, save_path)
     
