@@ -1,5 +1,0 @@
-Network architecture: 784-20-20-20-20-10
-Number of time steps: T=2
-Train loss: 0.89, train accuracy: 93.93 % 
-Test loss: 0.92, test accuracy: 92.42 %
-Training time is approximately 299 seconds over 20 epochs.
