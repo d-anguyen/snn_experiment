@@ -193,7 +193,7 @@ def compare_snn(variable, train_loader, test_loader, seed = None, num_epochs = 2
         print(f'############################### Trial number {_+1} #################################')
         # Run experiments depending on the given concern
         if variable == 'num_steps':
-            list_x = [2**i for i in range(1,7)]
+            list_x = [2,4,6,8,12,16,24,32]  #[2*i for i in range(1,9)]#[2*i for i in range(1,9)]
             for num_steps in list_x:
                 list_loss_acc.append(snn_train_and_save(num_steps, n_first_hidden, num_binary_layers, n_hidden, 
                     train_loader, test_loader, save_path, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay))
