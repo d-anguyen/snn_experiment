@@ -268,7 +268,7 @@ def compare_ann(variable, train_loader, test_loader, seed = None, num_epochs = 2
             for n_hidden in list_x:
                 list_loss_acc.append(ann_train_and_save(n_first_hidden, num_hidden_layers, n_hidden,
                     train_loader, test_loader, save_path, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay))
-            plot_desc = 'Width of the subsequent hidden layer'
+            plot_desc = 'Width of the subsequent hidden layers'
         else:
             raise ValueError("Choose to vary either 'n_first_hidden', 'num_hidden_layers', or 'n_hidden'.")
         trial_results.append(np.array(list_loss_acc))
