@@ -99,5 +99,3 @@ class Sigmoid_ANN(nn.Module):
         out = self.net(x.flatten(1))
         return out
     
-
-print(ann)
