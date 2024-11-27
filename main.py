@@ -50,7 +50,7 @@ test_loader = DataLoader(mnist_test, batch_size=batch_size, shuffle=True)
 
 # Comparison of ANNs hyperparameters. Choose either 'n_first_hidden', 'num_hidden_layers' or 'n_hidden'
 
-compare_ann('n_first_hidden', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
-compare_ann('n_hidden', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
+#compare_ann('n_first_hidden', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
+#compare_ann('n_hidden', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
 compare_ann('num_hidden_layers', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
 

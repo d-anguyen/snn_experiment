@@ -67,7 +67,7 @@ class ANN(nn.Module):
             layers+=[nn.Linear(n_first_hidden, n_hidden), nn.ReLU()]
             for i in range(num_hidden_layers-2):
                 layers+= [nn.Linear(n_hidden, n_hidden),nn.ReLU()]
-        layers+=[nn.Linear(n_hidden, n_out)]
+            layers+=[nn.Linear(n_hidden, n_out)]
         
         self.net = nn.Sequential(*layers)
         
