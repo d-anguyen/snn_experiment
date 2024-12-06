@@ -1,23 +1,9 @@
-import snntorch as snn
 import os
-from snntorch import spikeplot as splt
-from snntorch import spikegen
-
 import torch
-import torch.nn as nn
 import numpy as np
 
-from torch.utils.data.dataset import Dataset
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-
-
-import matplotlib.pyplot as plt
-
-import models
-import train
-
 from helper import *
+from models import *
 
 
 dtype = torch.float
@@ -25,76 +11,66 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 
 # Prepare MNIST datasets
-data_path='/tmp/data/mnist'
 batch_size = 256
-transform = transforms.Compose([
-            transforms.Resize((28, 28)),
-            transforms.Grayscale(),
-            transforms.ToTensor(),
-            transforms.Normalize((0,), (1,))])
-
-mnist_train = datasets.MNIST(data_path, train=True, download=True, transform=transform)
-mnist_test = datasets.MNIST(data_path, train=False, download=True, transform=transform)
-
-train_loader = DataLoader(mnist_train, batch_size=batch_size, shuffle=True)
-test_loader = DataLoader(mnist_test, batch_size=batch_size, shuffle=True)
-
-
-# Choose either 'num_first_hidden', 'num_steps', 'num_binary_layers' or 'n_hidden'
-#compare('n_first_hidden', train_loader, test_loader, seed = 30, num_epochs=20, num_trials=10)
-
-
-
-# Define the hyperparameters
-num_steps = 4
-n_first_hidden = 30
-num_binary_layers = 7
-n_hidden = 20
-
+dataset = 'cifar10' # choose 'mnist', 'cifar10' 
+#train_loader, test_loader, n_in, n_out = load_dataset(dataset, batch_size=batch_size)
 seed = np.random.randint(100) # later set a seed to fix the initialization
 # seed = 30
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 pretrained = False
 
-# Create a folder to save results
-# save_path = './example_results/'
 
-# name = 'T='+ str(num_steps)+'_784-' + str(n_first_hidden)
-# for i in range(num_binary_layers):
-#     name += '-' +str(n_hidden)
-# name += '-10/'
-# save_path+= name
-# os.makedirs(save_path, exist_ok=True)
-# # Create a file to save accuracy
-# if not os.path.exists(save_path+'results.txt'):
-#     with open(save_path+'results.txt', 'w'): pass
+# Define the network dimensions
+num_steps = 2
+n_first_hidden = 80
+num_binary_layers = 4
+n_hidden = 20
+num_hidden_layers = num_binary_layers-1
 
-net = models.SNN(num_steps=num_steps, n_first_hidden=n_first_hidden, 
-                  num_binary_layers=num_binary_layers, n_hidden=n_hidden).to(device)
-print(f'Number of time steps: T={num_steps}')
-print(net)
+list_n_first_hidden = [20*i for i in range(1,11)]
+list_num_binary_layers = [i for i in range(2,8)]
+list_n_hidden = [20*i for i in range(1,11)]
+list_num_steps = [2,4,6,8,12,16,24,32,48,64]
+list_num_hidden_layers = [i for i in range(1,7)]
 
 
-train.train_snn_monitor_grad(net, train_loader, test_loader, num_epochs = 10, 
-                                 output='spike', monitor_grad=True)
-
-#file = open(save_path+'results.txt', 'a')
-train.print_snn_statistics(net, train_loader, epoch=10, file=None, train=True, output='spike')
-train.print_snn_statistics(net, test_loader, epoch=10, file=None, train=False, output='spike')
-#file.close()
-
+# Training hyperparameters
+num_epochs = 8
+lr = 1e-3
+weight_decay= 5e-4
+lr_step = num_epochs/2
+lr_gamma = 0.1
 
 
-
-
+# Display hyperparameters
+save_path = './example_results/'
+os.makedirs(save_path, exist_ok=True)
+display_iter = int((60000/batch_size) / 4) #print batch statistics 4 times per epoch
+eval_epoch = int(num_epochs / 2) #evaluate and save params after every 10-th epoch
+save_epoch = True
 
 
 
+# Display parameters
+# experiment_snn(num_steps, n_first_hidden, num_binary_layers, n_hidden, 
+#                train_loader, test_loader, save_path=save_path, pretrained=False, 
+#                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
+#                output='spike', display_iter =50, eval_epoch=2, save_epoch=True)
 
 
+# experiment_ann(n_first_hidden, num_hidden_layers, n_hidden, 
+#                train_loader, test_loader, save_path=save_path, pretrained=False, 
+#                num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma,
+#                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=True)
+
+#compare_snn(train_loader, test_loader, num_steps=2, n_first_hidden=[3,4], num_binary_layers=4, n_hidden=30)
 
 
-
+compare_snn(dataset, batch_size=batch_size, num_steps=2, n_first_hidden=[3,4], 
+                num_binary_layers=4, n_hidden=5, seed = None, output='spike',
+                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
+                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './snn_comparison/'+dataset+'/', num_trials=2)
 
 

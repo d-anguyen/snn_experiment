@@ -20,30 +20,33 @@ import train
 from helper import *
 
 
+# Training hyperparameters
 dtype = torch.float
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
+dataset = 'mnist' #'cifar10
+num_epochs = 200
+batch_size = 2048
+lr= 1e-3 
+weight_decay=0 
+lr_step=100 
+lr_gamma=0.1
 
-# Prepare MNIST datasets
-data_path='/tmp/data/mnist'
-batch_size = 256
-transform = transforms.Compose([
-            transforms.Resize((28, 28)),
-            transforms.Grayscale(),
-            transforms.ToTensor(),
-            transforms.Normalize((0,), (1,))])
+# Display parameters
+eval_epoch = num_epochs/10 #evaluate the network after this number of epochs
+display_iter = int( (60000/batch_size) / 4 ) #display batch statistics 4 times every epoch
+# turn to None to do silent training
 
-mnist_train = datasets.MNIST(data_path, train=True, download=True, transform=transform)
-mnist_test = datasets.MNIST(data_path, train=False, download=True, transform=transform)
 
-train_loader = DataLoader(mnist_train, batch_size=batch_size, shuffle=True)
-test_loader = DataLoader(mnist_test, batch_size=batch_size, shuffle=True)
+# Prepare MNIST/CIFAR10 datasets
+train_loader, test_loader = load_dataset(dataset, batch_size=batch_size,shuffle=True)
+
 
 
 # Comparison of SNNs hyperparameters. Choose either 'n_first_hidden', 'num_steps', 'num_binary_layers' or 'n_hidden'
 
 #compare_snn('n_first_hidden', train_loader, test_loader, num_epochs=20, num_trials=10)
-#compare_snn('n_hidden', train_loader, test_loader, num_epochs=20, num_trials=10)
+#compare_snn('n_hidden', train_loader, test_loader, num_epochs=200, num_trials=1)
 #compare_snn('num_steps', train_loader, test_loader, num_epochs=20, num_trials=10)
 #compare_snn('num_binary_layers', train_loader, test_loader, num_epochs=20, num_trials=10)
 
@@ -52,5 +55,5 @@ test_loader = DataLoader(mnist_test, batch_size=batch_size, shuffle=True)
 
 #compare_ann('n_first_hidden', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
 #compare_ann('n_hidden', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
-compare_ann('num_hidden_layers', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
+#compare_ann('num_hidden_layers', train_loader, test_loader, num_epochs=20, num_trials=10, weight_decay=1e-4)
 
