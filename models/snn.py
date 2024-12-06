@@ -51,3 +51,5 @@ class SNN(nn.Module):
         
 
     
+
+print(ann)
