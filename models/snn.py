@@ -48,8 +48,3 @@ class SNN(nn.Module):
             mem_rec.append(mem_out)
 
         return torch.stack(spk_rec), torch.stack(mem_rec)
-        
-
-    
-
-print(ann)
