@@ -48,6 +48,3 @@ class Sigmoid_ANN(nn.Module):
     def forward(self, x):
         out = self.net(x.flatten(1))
         return out
-    
-def test():
-    print('adsf')
