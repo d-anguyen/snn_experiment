@@ -34,7 +34,7 @@ list_num_hidden_layers = [i for i in range(1,7)]
 
 
 # Training hyperparameters
-num_epochs = 4
+num_epochs = 200
 lr = 1e-3
 weight_decay= 5e-4
 lr_step = num_epochs/2
@@ -45,7 +45,7 @@ lr_gamma = 0.1
 #save_path = './example_results/'
 #os.makedirs(save_path, exist_ok=True)
 display_iter = int((60000/batch_size) / 4) #print batch statistics 4 times per epoch
-eval_epoch = int(num_epochs / 2) #evaluate and save params after every 10-th epoch
+eval_epoch = int(num_epochs / 10) #evaluate and save params after every 10-th epoch
 save_epoch = True
 
 
