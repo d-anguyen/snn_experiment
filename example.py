@@ -63,13 +63,6 @@ save_epoch = True
 #                num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma,
 #                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=True)
 
-#compare_snn(train_loader, test_loader, num_steps=2, n_first_hidden=[3,4], num_binary_layers=4, n_hidden=30)
 
-
-compare_snn(dataset, batch_size=batch_size, num_steps=2, n_first_hidden=[3,4], 
-                num_binary_layers=4, n_hidden=5, seed = None, output='spike',
-                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
-                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-                pretrained=False, save_path = './snn_comparison/'+dataset+'/', num_trials=2)
 
 

@@ -10,7 +10,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 
 # Prepare MNIST datasets
-batch_size = 256
+batch_size = 2048
 dataset = 'cifar10' # choose 'mnist', 'cifar10' 
 seed = np.random.randint(300) # later set a seed to fix the initialization
 # seed = 30
@@ -20,7 +20,7 @@ pretrained = False
 
 
 # Define the network dimensions
-num_steps = 2
+num_steps = 8
 n_first_hidden = 100
 num_binary_layers = 4
 n_hidden = 100
@@ -65,10 +65,10 @@ save_epoch = True
 #compare_snn(train_loader, test_loader, num_steps=2, n_first_hidden=[3,4], num_binary_layers=4, n_hidden=30)
 
 
-compare_snn(dataset, batch_size=batch_size, num_steps=[2,3], n_first_hidden=n_first_hidden, 
+compare_snn(dataset, batch_size=batch_size, num_steps=list_num_steps, n_first_hidden=n_first_hidden, 
                 num_binary_layers=num_binary_layers, n_hidden=n_hidden, seed = seed, output='spike',
                 num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
                 display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-                pretrained=False, save_path = './snn_comparison/'+dataset+'/', num_trials=2)
+                pretrained=False, save_path = './snn_comparison/'+dataset+'/', num_trials=10)
 
 
