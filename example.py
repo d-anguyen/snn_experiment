@@ -13,6 +13,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 batch_size = 2048
 dataset = 'cifar10' # choose 'mnist', 'cifar10' 
 train_loader, test_loader, n_in, n_out = load_dataset(dataset, batch_size=batch_size)
+print(n_in, n_out)
 seed = np.random.randint(100) # later set a seed to fix the initialization
 # seed = 30
 torch.manual_seed(seed)
@@ -56,9 +57,9 @@ save_epoch = True
 #             save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, 
 #             lr_gamma=lr_gamma, output='spike', display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=False)
 
-experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_hidden_layers, 
-            n_hidden, save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, 
-            lr_step=lr_step, lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=False)
+# experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_hidden_layers, 
+#             n_hidden, save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, 
+#             lr_step=lr_step, lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=False)
 # experiment_ann(n_first_hidden, num_hidden_layers, n_hidden, 
 #                train_loader, test_loader, save_path=save_path, pretrained=False, 
 #                num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma,

@@ -126,7 +126,7 @@ def experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_h
     os.makedirs(save_path, exist_ok=True)
     
     # Randomize the network and train (if no pretrained model is available)
-    net = ANN(n_first_hidden=n_first_hidden, num_hidden_layers = num_hidden_layers, 
+    net = ANN(n_in=n_in, n_out=n_out, n_first_hidden=n_first_hidden, num_hidden_layers = num_hidden_layers, 
               n_hidden = n_hidden).to(device)
     file = open(save_path+'results.txt', 'w')
     print_and_save('Network architecture: '+name, file)
