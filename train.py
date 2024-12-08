@@ -360,6 +360,3 @@ def evaluate_ann(net, data_loader):
     accuracy = acc/total
     
     return total_loss, accuracy
-
-def test():
-    print("asdf")

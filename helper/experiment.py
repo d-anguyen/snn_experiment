@@ -139,7 +139,7 @@ def experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_h
         train_time = None
     else:
         start_time = time.time()
-        train_ann(net, train_loader, test_loader, num_epochs=num_epochs, lr= lr, 
+        train_hist, test_hist, batch_hist = train_ann(net, train_loader, test_loader, num_epochs=num_epochs, lr= lr, 
                   weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                   display_iter= display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch, save_path=save_path)
         train_time = time.time()-start_time
@@ -168,6 +168,8 @@ def experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_h
     
     if file is not None:
         file.close()
+    plot_learning_curve(train_hist, test_hist, batch_hist, plot_batch= False, 
+                    eval_epoch=eval_epoch, num_epochs=num_epochs, desc = '', save_path = save_path)
     
     return train_loss, train_acc, test_loss, test_acc, train_time, test_inference_time
 
@@ -275,7 +277,7 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden,
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
-            save_path =path+ 'compare_n_first_hidden_trial_'+str(trial+1)+'/'
+            save_path =path+ 'compare_n_first_hidden/trial'+str(trial+1)+'/'
             os.makedirs(save_path, exist_ok=True)
             print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
             for val in n_first_hidden:
@@ -305,7 +307,7 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden,
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
-            save_path =path+ 'compare_n_hidden/_trial_'+str(trial+1)+'/'
+            save_path =path+ 'compare_n_hidden/trial_'+str(trial+1)+'/'
             os.makedirs(save_path, exist_ok=True)
             print(f'###### Experiments on width of subsequent hidden layers ###### Trial number {trial+1} ######')
             for val in n_first_hidden:
