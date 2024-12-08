@@ -21,7 +21,7 @@ pretrained = False
 
 
 # Define the network dimensions
-num_steps = 2
+num_steps = 8
 n_first_hidden = 100
 num_binary_layers = 4
 n_hidden = 100

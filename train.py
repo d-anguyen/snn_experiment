@@ -100,6 +100,72 @@ def train_snn(net, train_loader, test_loader, num_epochs=100,
     else: 
         return None, None, batch_hist
 
+def train_ann(net, train_loader, test_loader, num_epochs=100, lr= 1e-3, weight_decay=0, lr_step=50, 
+              lr_gamma=0.1, display_iter= None, eval_epoch=None, save_epoch=False, save_path=None):
+    loss = nn.CrossEntropyLoss()    
+
+    if save_epoch:
+        os.makedirs(save_path+'params', exist_ok = True)
+                
+    optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=lr_step, gamma=lr_gamma)
+    # To display statistics
+    train_hist, test_hist, batch_hist = [], [], [] #should be [[loss,accuracy] for each epoch/batch]
+    # Outer training loop        
+    for epoch in tqdm(range(num_epochs), desc='Training epoch'):
+        print(f"#### Learning rate {scheduler.get_last_lr()[0]:.2e} ####")
+        # Minibatch training loop
+        for i, (data, targets) in enumerate(iter(train_loader)):
+            data = data.to(dtype=torch.float).to(device)
+            targets = targets.to(device)
+    
+            # forward pass
+            net.train()
+            out = net(data)
+            loss_val = loss(out, targets)
+    
+            # Gradient calculation + weight update
+            optimizer.zero_grad()
+            loss_val.backward()
+            optimizer.step()
+            
+            # Show statistics within the minibatch
+            if (display_iter is not None) and (i%display_iter==0):
+                net.eval()
+                _, predicted = torch.max(out.data, 1)
+                acc = (predicted == targets).sum().item()/targets.size(0)
+                batch_hist.append([loss_val.item(), acc])
+                print(f"--- Iteration {i} --- Train Loss: {loss_val.item():.2f} --- Minibatch accuracy: {acc * 100:.2f}%")
+        
+        scheduler.step()     
+        print('\n')
+        
+        # Evaluation
+        if eval_epoch is not None:
+            # Evaluate after several epochs (results are printed out but not saved)
+            if epoch%eval_epoch==0 or epoch == num_epochs-1:
+                train_loss, train_acc = evaluate_ann(net, train_loader)
+                test_loss, test_acc = evaluate_ann(net, test_loader)
+                print(f'Statistics at epoch {epoch+1}:')
+                print(f'-Train loss: {train_loss:.2f}, train accuracy: {train_acc*100:.2f}%')
+                print(f'-Test loss: {test_loss:.2f}, test accuracy: {test_acc*100:.2f}%')
+                
+                train_hist.append([train_loss, train_acc])
+                test_hist.append([test_loss, test_acc])
+                
+                # Save the network parameters if needed
+                if (save_path is not None) and save_epoch:
+                    torch.save(net.state_dict(), save_path+'params/params_after_epoch_' + str(epoch+1)+'.pth')
+                    
+            # Evaluation in the end of training (and saving results) is moved to other function
+            # so if we set eval_epoch to None, the training is quite plain in the sense that 
+            # we mostly don't do evaluation.
+    
+    # Return the dataset/batch statistics to plot learning curve
+    if eval_epoch is not None:           
+        return train_hist, test_hist, batch_hist
+    else: 
+        return None, None, batch_hist
 
 # Plot Loss curve during training given a list of train/test loss values
 def plot_learning_curve(train_hist, test_hist, batch_hist, plot_batch= False, 
@@ -264,72 +330,7 @@ def train_snn_monitor_grad(net, train_loader, test_loader, save_path=None, num_e
             #train_loss_hist.append(train_loss)
             #test_loss_hist.append(test_loss)
         
-def train_ann(net, train_loader, test_loader, num_epochs=100, lr= 1e-3, weight_decay=0, lr_step=50, 
-              lr_gamma=0.1, display_iter= None, eval_epoch=None, save_epoch=False, save_path=None):
-    loss = nn.CrossEntropyLoss()    
 
-    if save_epoch:
-        os.makedirs(save_path+'params', exist_ok = True)
-                
-    optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=lr_step, gamma=lr_gamma)
-    # To display statistics
-    train_hist, test_hist, batch_hist = [], [], [] #should be [[loss,accuracy] for each epoch/batch]
-    # Outer training loop        
-    for epoch in tqdm(range(num_epochs), desc='Training epoch'):
-        print(f"#### Learning rate {scheduler.get_last_lr()[0]:.2e} ####")
-        # Minibatch training loop
-        for i, (data, targets) in enumerate(iter(train_loader)):
-            data = data.to(dtype=torch.float).to(device)
-            targets = targets.to(device)
-    
-            # forward pass
-            net.train()
-            out = net(data)
-            loss_val = loss(out, targets)
-    
-            # Gradient calculation + weight update
-            optimizer.zero_grad()
-            loss_val.backward()
-            optimizer.step()
-            
-            # Show statistics within the minibatch
-            if i%50==0:
-                net.eval()
-                _, predicted = torch.max(out.data, 1)
-                acc = (predicted == targets).sum().item()/targets.size(0)
-                batch_hist.append([loss_val.item(), acc])
-                print(f"--- Iteration {i} --- Train Loss: {loss_val.item():.2f} --- Minibatch accuracy: {acc * 100:.2f}%")
-        
-        scheduler.step()     
-        print('\n')
-        
-        # Evaluation
-        if eval_epoch is not None:
-            # Evaluate after several epochs (results are printed out but not saved)
-            if epoch%eval_epoch==0 or epoch == num_epochs-1:
-                train_loss, train_acc = evaluate_ann(net, train_loader)
-                test_loss, test_acc = evaluate_ann(net, test_loader)
-                print(f'Statistics at epoch {epoch+1}:')
-                print(f'-Train loss: {train_loss:.2f}, train accuracy: {train_acc*100:.2f}%')
-                print(f'-Test loss: {test_loss:.2f}, test accuracy: {test_acc*100:.2f}%')
-                
-                train_hist.append([train_loss, train_acc])
-                test_hist.append([test_loss, test_acc])
-                
-                # Save the network parameters if needed
-                if (save_path is not None) and save_epoch:
-                    torch.save(net.state_dict(), save_path+'params/params_after_epoch_' + str(epoch+1)+'.pth')
-                    
-            # Evaluation in the end of training (and saving results) is moved to other function
-            # so if we set eval_epoch to None, the training is quite plain in the sense that 
-            # we mostly don't do evaluation.
-    
-    # Return the dataset/batch statistics to plot learning curve
-    if eval_epoch is not None:           
-        return train_hist, test_hist, batch_hist
-    else: 
-        return None, None, batch_hist
 
 def evaluate_ann(net, data_loader):
     loss = nn.CrossEntropyLoss()
