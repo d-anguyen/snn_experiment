@@ -46,7 +46,7 @@ lr_gamma = 0.1
 save_path = './example_results/'
 os.makedirs(save_path, exist_ok=True)
 display_iter = int((60000/batch_size) / 4) #print batch statistics 4 times per epoch
-eval_epoch = int(num_epochs / 2) #evaluate and save params after every 10-th epoch
+eval_epoch = int(num_epochs / 10) #evaluate and save params after every 10-th epoch
 save_epoch = True
 
 
