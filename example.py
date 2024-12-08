@@ -13,7 +13,6 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 batch_size = 2048
 dataset = 'cifar10' # choose 'mnist', 'cifar10' 
 train_loader, test_loader, n_in, n_out = load_dataset(dataset, batch_size=batch_size)
-print(n_in, n_out)
 seed = np.random.randint(100) # later set a seed to fix the initialization
 # seed = 30
 torch.manual_seed(seed)
