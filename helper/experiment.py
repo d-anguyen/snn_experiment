@@ -228,7 +228,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
             list_loss_acc = []
             save_path =path+ 'compare_num_binary_layers/trial_'+str(trial+1)+'/'
             os.makedirs(save_path, exist_ok=True)
-            print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
+            print(f'###### Experiments on number of binary layers ###### Trial number {trial+1} ######')
             for val in num_binary_layers:
                 list_loss_acc.append(
                 experiment_snn(train_loader, test_loader, n_in=n_in, n_out=n_out, num_steps=num_steps, n_first_hidden=n_first_hidden, 
