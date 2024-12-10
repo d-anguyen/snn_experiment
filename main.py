@@ -86,6 +86,6 @@ save_epoch = True
 #                 pretrained=False, save_path = './ANN_comparison/'+dataset+'/', num_trials=10)
 
 # compare_ann(dataset, batch_size=batch_size, n_first_hidden=n_first_hidden, num_hidden_layers=num_hidden_layers, 
-#                 n_hidden=n_hidden, seed = seed, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+#                 n_hidden=list_n_hidden, seed = seed, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
 #                 lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
 #                 pretrained=False, save_path = './ANN_comparison/'+dataset+'/', num_trials=10)

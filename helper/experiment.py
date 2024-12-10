@@ -310,7 +310,7 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden,
             save_path =path+ 'compare_n_hidden/trial_'+str(trial+1)+'/'
             os.makedirs(save_path, exist_ok=True)
             print(f'###### Experiments on width of subsequent hidden layers ###### Trial number {trial+1} ######')
-            for val in n_first_hidden:
+            for val in n_hidden:
                 list_loss_acc.append(
                 experiment_ann(train_loader, test_loader, n_in=n_in, n_out=n_out, n_first_hidden=n_first_hidden, num_hidden_layers=num_hidden_layers, 
                 n_hidden=val, save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
