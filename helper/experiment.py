@@ -31,8 +31,8 @@ def load_dataset(name, batch_size=256, shuffle=True):
         train_set = datasets.CIFAR10(data_path, train=True, download=True, transform=transform)
         test_set = datasets.CIFAR10(data_path, train=False, download=True, transform=transform)
     
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle)
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=4)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers =4)
     n_in = train_set[0][0].flatten().size(0)
     n_out = len(train_set.classes)
     
