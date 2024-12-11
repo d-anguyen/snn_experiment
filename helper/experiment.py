@@ -51,8 +51,8 @@ def print_and_save(text_str, file):
 #################################################################
 # run the training for one specific hyperparameter set and return statistics after several epochs
 def experiment_snn(train_loader, test_loader, n_in, n_out, num_steps, n_first_hidden, num_binary_layers, n_hidden, 
-            save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=0, lr_step=50, lr_gamma=0.1,
-            output='spike', display_iter =None, eval_epoch=None, save_epoch=False):    
+            output='spike', seed=None, save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=0, 
+            lr_step=50, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False):    
     if save_path is not None:
         # Create a folder to save the results
         name = 'T='+ str(num_steps)+'_' + str(n_in) +'-' + str(n_first_hidden)
@@ -67,10 +67,11 @@ def experiment_snn(train_loader, test_loader, n_in, n_out, num_steps, n_first_hi
         file.close()
             
     # Randomize the network and train (if no pretrained model is available)
+    if seed is not None:
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
     net = SNN(n_in=n_in, n_out=n_out, num_steps=num_steps, n_first_hidden=n_first_hidden, 
                      num_binary_layers = num_binary_layers, n_hidden = n_hidden).to(device)
-    
-    #print(f'Number of time steps: T={num_steps}')
     print(net)
 
     if pretrained==True:    
@@ -114,8 +115,8 @@ def experiment_snn(train_loader, test_loader, n_in, n_out, num_steps, n_first_hi
 
 
 ##############################################################
-def experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_hidden_layers, 
-            n_hidden, save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=5e-4, 
+def experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_hidden_layers, n_hidden, 
+            seed=None, save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=5e-4, 
             lr_step=50, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False):    
     # Create a folder to save the results
     name = 'ANN_'+str(n_in)+ '-' + str(n_first_hidden)
@@ -126,6 +127,9 @@ def experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_h
     os.makedirs(save_path, exist_ok=True)
     
     # Randomize the network and train (if no pretrained model is available)
+    if seed is not None:
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
     net = ANN(n_in=n_in, n_out=n_out, n_first_hidden=n_first_hidden, num_hidden_layers = num_hidden_layers, 
               n_hidden = n_hidden).to(device)
     file = open(save_path+'results.txt', 'w')
@@ -176,16 +180,10 @@ def experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_h
 # One of the network hyperparameters will be varied from elements of a given list. 
 # Others will be given fixed. Run each experiment with that set of network hyperparams
 # a number of times and output the results. 
-def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden, seed = None, 
-                output='spike', batch_size=256, num_epochs=200, lr=1e-3, weight_decay=0, lr_step=100, 
-                lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False,
-                pretrained=False, save_path = './SNN_comparison/', num_trials=1):
+def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden, output='spike', batch_size=256, 
+                num_epochs=200, lr=1e-3, weight_decay=0, lr_step=100, lr_gamma=0.1, display_iter =None, 
+                eval_epoch=None, save_epoch=False, pretrained=False, save_path = './SNN_comparison/', num_trials=1):
     train_loader, test_loader, n_in, n_out = load_dataset(dataset, batch_size= batch_size)
-    
-    # Fix a seed in case we want a single fixed trial 
-    if (num_trials==1) and (seed is not None):
-        torch.manual_seed(seed)
-        torch.cuda.manual_seed(seed)
     trial_results = []
     path = save_path
     
@@ -260,15 +258,11 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
     
 
 #############################################################
-def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, 
-                seed = None, batch_size=256, num_epochs=200, lr=1e-3, weight_decay=0, lr_step=100,
-                lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False,
+def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size=256, num_epochs=200, lr=1e-3, 
+                weight_decay=0, lr_step=100, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False,
                 pretrained=False, save_path = './ANN_comparison/', num_trials=1):
-    train_loader, test_loader, n_in, n_out = load_dataset(dataset, batch_size= batch_size)
-    # Fix a seed in case we want a single fixed trial 
-    if (num_trials==1) and (seed is not None):
-        torch.manual_seed(seed)
-        torch.cuda.manual_seed(seed)
+    
+    train_loader, test_loader, n_in, n_out = load_dataset(dataset, batch_size= batch_size) 
     trial_results = []
     path = save_path
     
