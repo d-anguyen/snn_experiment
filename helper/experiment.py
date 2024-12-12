@@ -23,34 +23,39 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 def load_dataset(name, batch_size=256, shuffle=True):
     data_path = '/tmp/data/'+name  
     if name == 'mnist':
-        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
         train_set = datasets.MNIST(data_path, train=True, download=True, transform=transform)
         test_set = datasets.MNIST(data_path, train=False, download=True, transform=transform)
-        n_out = 10
+        chw_in, n_out = (1,28,28), 10
 
     elif name == 'fashion_mnist':
-        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.2860,), (0.3530,))])
         train_set = datasets.MNIST(data_path, train=True, download=True, transform=transform)
         test_set = datasets.MNIST(data_path, train=False, download=True, transform=transform)
-        n_out = 10
+        chw_in, n_out = (1,28,28), 10
     elif name == 'cifar10':
-        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        transform = transforms.Compose([transforms.ToTensor(), 
+                transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2616])])
         train_set = datasets.CIFAR10(data_path, train=True, download=True, transform=transform)
         test_set = datasets.CIFAR10(data_path, train=False, download=True, transform=transform)
-        n_out = 10
+        chw_in, n_out = (3,32,32) ,10
     elif name == 'svhn':
-        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-        train_set = datasets.SVHN(data_path, train=True, download=True, transform=transform)
-        test_set = datasets.SVHN(data_path, train=False, download=True, transform=transform)
-        n_out = 10
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=16)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=16)
-    n_in = train_set[0][0].flatten().size(0)
-    n_out = len(train_set.classes)
+        transform = transforms.Compose([transforms.ToTensor(), 
+                transforms.Normalize([0.4377, 0.4438, 0.4728], [0.1980, 0.2010, 0.1970])])
+        train_set = datasets.SVHN(data_path, split='train', download=True, transform=transform)
+        test_set = datasets.SVHN(data_path, split='test', download=True, transform=transform)
+        chw_in, n_out = (3,32,32), 10
+    elif name == 'stl10':
+        transform = transforms.Compose([transforms.ToTensor(), 
+                transforms.Normalize([0.4467, 0.4398, 0.4066], [0.2240, 0.2215, 0.2239])])
+        train_set = datasets.STL10(data_path, split='train', download=True, transform=transform)
+        test_set = datasets.STL10(data_path, split='test', download=True, transform=transform)
+        chw_in, n_out = (3,96,96), 10
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=2)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=2)
     
-    return train_loader, test_loader, n_in, n_out
-    
-# fix this n_in n_out computations
+    return train_loader, test_loader, chw_in, n_out 
+
 
 
 def print_and_save(text_str, file):
@@ -62,9 +67,10 @@ def print_and_save(text_str, file):
 
 #################################################################
 # run the training for one specific hyperparameter set and return statistics after several epochs
-def experiment_snn(train_loader, test_loader, n_in, n_out, num_steps, n_first_hidden, num_binary_layers, n_hidden, 
+def experiment_snn(train_loader, test_loader, chw_in, n_out, num_steps, n_first_hidden, num_binary_layers, n_hidden, 
             output='spike', seed=None, save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=0, 
             lr_step=50, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False):    
+    n_in = chw_in[0]*chw_in[1]*chw_in[2]
     if save_path is not None:
         # Create a folder to save the results
         name = 'T='+ str(num_steps)+'_' + str(n_in) +'-' + str(n_first_hidden)
@@ -77,7 +83,7 @@ def experiment_snn(train_loader, test_loader, n_in, n_out, num_steps, n_first_hi
         file = open(save_path+'results.txt', 'w')
         print_and_save('Network architecture: '+name, file)
         file.close()
-            
+    
     # Randomize the network and train (if no pretrained model is available)
     if seed is not None:
         torch.manual_seed(seed)
@@ -126,10 +132,78 @@ def experiment_snn(train_loader, test_loader, n_in, n_out, num_steps, n_first_hi
     return train_loss, train_acc, test_loss, test_acc, train_time, test_inference_time
 
 
+def experiment_csnn(train_loader, test_loader, c_in, n_out, num_steps, c_first_hidden, num_binary_layers, c_hidden, 
+            output='spike', seed=None, save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=0, 
+            lr_step=50, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False):    
+    if save_path is not None:
+        # Create a folder to save the results
+        name = 'T='+ str(num_steps)+'_' + str(n_in) +'-' + str(n_first_hidden)
+        for i in range(num_binary_layers-2):
+            name += '-' +str(n_hidden)
+        name += '-'+str(n_out)+'/'
+        save_path+= name
+        os.makedirs(save_path, exist_ok=True)
+        
+        file = open(save_path+'results.txt', 'w')
+        print_and_save('Network architecture: '+name, file)
+        file.close()
+    
+    # Randomize the network and train (if no pretrained model is available)
+    if seed is not None:
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+    net = SNN(n_in=n_in, n_out=n_out, num_steps=num_steps, n_first_hidden=n_first_hidden, 
+                     num_binary_layers = num_binary_layers, n_hidden = n_hidden).to(device)
+    print(net)
+
+    if pretrained==True:    
+        net.load_state_dict(torch.load(save_path+'trained_params.pth'))
+        train_time = None
+    else:
+        start_time = time.time()
+        train_hist, test_hist, batch_hist = train_snn(net, train_loader, test_loader, output='spike',  
+                  num_epochs=num_epochs, lr= lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma,
+                  display_iter= display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch, save_path=save_path)
+        
+        train_time = time.time()-start_time
+        if save_path is not None:
+            torch.save(net.state_dict(), save_path+'trained_params.pth')
+    
+    # Evaluate the trained network
+    print('\n ############################################')
+    train_loss, train_acc = evaluate_snn(net, train_loader)
+    
+    start_time = time.time()
+    test_loss, test_acc = evaluate_snn(net,test_loader)
+    test_inference_time = time.time() - start_time
+    
+    file = None
+    if save_path is not None:
+        file = open(save_path+'results.txt', 'a')
+    
+    print_and_save(f'Train loss: {train_loss:.2f}, train accuracy: {train_acc*100:.2f}%', file)
+    print_and_save(f'Test loss: {test_loss:.2f}, test accuracy: {test_acc*100:.2f}%', file)
+    if pretrained == False:
+        print_and_save(f'Training time: {str(datetime.timedelta(seconds= int(train_time)) )} seconds', file)
+    else:
+        print_and_save('Training time: unknown', file)
+    print_and_save(f'Test inference time: {test_inference_time:.2f} seconds', file)
+    
+    if file is not None:
+        file.close()
+    plot_learning_curve(train_hist, test_hist, batch_hist, plot_batch= False, 
+                    eval_epoch=eval_epoch, num_epochs=num_epochs, desc = '', save_path = save_path)
+    return train_loss, train_acc, test_loss, test_acc, train_time, test_inference_time
+
+
+
+
+
 ##############################################################
-def experiment_ann(train_loader, test_loader, n_in, n_out, n_first_hidden, num_hidden_layers, n_hidden, 
+def experiment_ann(train_loader, test_loader, chw_in, n_out, n_first_hidden, num_hidden_layers, n_hidden, 
             seed=None, save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=5e-4, 
             lr_step=50, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False):    
+    n_in = chw_in[0]*chw_in[1]*chw_in[2]
     # Create a folder to save the results
     name = 'ANN_'+str(n_in)+ '-' + str(n_first_hidden)
     for i in range(num_hidden_layers-1):
