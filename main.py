@@ -11,20 +11,20 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 # Prepare dataset
 batch_size = 1024
-dataset = 'cifar10' # choose 'mnist', 'cifar10' 
+dataset = 'cifar10' # choose 'mnist', 'cifar10', 'fashion_mnist'
 
 
 
 # Define the network dimensions
 num_steps = 8
-n_first_hidden = 20
+n_first_hidden = 100
 num_binary_layers = 4
-n_hidden = 20
+n_hidden = 100
 num_hidden_layers = num_binary_layers-1
 
-list_n_first_hidden = [4*i for i in range(1,11)] #replace 4 by 20 for cifar10
+list_n_first_hidden = [20*i for i in range(1,11)] 
 list_num_binary_layers = [i for i in range(2,8)]
-list_n_hidden = [4*i for i in range(1,11)] # increase width for cifar10
+list_n_hidden = [20*i for i in range(1,11)] 
 list_num_steps = [2*i for i in range(1,9)] 
 list_num_hidden_layers = [i for i in range(1,7)]
 

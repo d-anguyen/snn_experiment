@@ -26,19 +26,31 @@ def load_dataset(name, batch_size=256, shuffle=True):
         transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
         train_set = datasets.MNIST(data_path, train=True, download=True, transform=transform)
         test_set = datasets.MNIST(data_path, train=False, download=True, transform=transform)
+        n_out = 10
+
+    elif name == 'fashion_mnist':
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+        train_set = datasets.MNIST(data_path, train=True, download=True, transform=transform)
+        test_set = datasets.MNIST(data_path, train=False, download=True, transform=transform)
+        n_out = 10
     elif name == 'cifar10':
         transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
         train_set = datasets.CIFAR10(data_path, train=True, download=True, transform=transform)
         test_set = datasets.CIFAR10(data_path, train=False, download=True, transform=transform)
-    
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=4)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers =4)
+        n_out = 10
+    elif name == 'svhn':
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        train_set = datasets.SVHN(data_path, train=True, download=True, transform=transform)
+        test_set = datasets.SVHN(data_path, train=False, download=True, transform=transform)
+        n_out = 10
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=16)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=16)
     n_in = train_set[0][0].flatten().size(0)
     n_out = len(train_set.classes)
     
     return train_loader, test_loader, n_in, n_out
     
-
+# fix this n_in n_out computations
 
 
 def print_and_save(text_str, file):
