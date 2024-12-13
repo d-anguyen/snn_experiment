@@ -10,7 +10,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 
 # Prepare MNIST datasets
-batch_size = 512
+batch_size = 256
 dataset = 'mnist' # choose 'mnist', 'cifar10' 
 train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size=batch_size)
 seed = None
