@@ -51,8 +51,8 @@ def load_dataset(name, batch_size=256, shuffle=True):
         train_set = datasets.STL10(data_path, split='train', download=True, transform=transform)
         test_set = datasets.STL10(data_path, split='test', download=True, transform=transform)
         chw_in, n_out = (3,96,96), 10
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=2)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=2)
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=0)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=0)
     
     return train_loader, test_loader, chw_in, n_out 
 
@@ -132,14 +132,14 @@ def experiment_snn(train_loader, test_loader, chw_in, n_out, num_steps, n_first_
     return train_loss, train_acc, test_loss, test_acc, train_time, test_inference_time
 
 
-def experiment_csnn(train_loader, test_loader, c_in, n_out, num_steps, c_first_hidden, num_binary_layers, c_hidden, 
+def experiment_csnn(train_loader, test_loader, chw_in, n_out, num_steps, C_first_hidden, num_binary_layers, C_hidden, 
             output='spike', seed=None, save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=0, 
             lr_step=50, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False):    
     if save_path is not None:
         # Create a folder to save the results
-        name = 'T='+ str(num_steps)+'_' + str(n_in) +'-' + str(n_first_hidden)
+        name = 'T='+ str(num_steps)+'_C' + str(chw_in[0]) +'-C' + str(C_first_hidden)
         for i in range(num_binary_layers-2):
-            name += '-' +str(n_hidden)
+            name += '-C' +str(C_hidden)
         name += '-'+str(n_out)+'/'
         save_path+= name
         os.makedirs(save_path, exist_ok=True)
@@ -152,8 +152,8 @@ def experiment_csnn(train_loader, test_loader, c_in, n_out, num_steps, c_first_h
     if seed is not None:
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
-    net = SNN(n_in=n_in, n_out=n_out, num_steps=num_steps, n_first_hidden=n_first_hidden, 
-                     num_binary_layers = num_binary_layers, n_hidden = n_hidden).to(device)
+    net = CSNN(chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=C_first_hidden, 
+                     num_binary_layers = num_binary_layers, C_hidden = C_hidden).to(device)
     print(net)
 
     if pretrained==True:    
@@ -195,7 +195,72 @@ def experiment_csnn(train_loader, test_loader, c_in, n_out, num_steps, c_first_h
                     eval_epoch=eval_epoch, num_epochs=num_epochs, desc = '', save_path = save_path)
     return train_loss, train_acc, test_loss, test_acc, train_time, test_inference_time
 
+def experiment_cnn(train_loader, test_loader, chw_in, n_out, C_first_hidden, num_hidden_layers, C_hidden, pool=False,
+            seed=None, save_path=None, pretrained=False, num_epochs=200, lr=1e-3, weight_decay=5e-4, 
+            lr_step=50, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False):    
+    n_in = chw_in[0]*chw_in[1]*chw_in[2]
+    # Create a folder to save the results
+    name = 'ANN_'+str(chw_in[0])+ '-C' + str(C_first_hidden)
+    if pool:
+        name+='-P'
+    for i in range(num_hidden_layers-1):
+        name += '-' +str(C_hidden)
+    if pool:
+        name+='-P'
+    name += '-' + str(n_out)+'/'
+    save_path+= name
+    os.makedirs(save_path, exist_ok=True)
+    
+    # Randomize the network and train (if no pretrained model is available)
+    if seed is not None:
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+    net = CNN(chw_in=chw_in, n_out=n_out, C_first_hidden=C_first_hidden, num_hidden_layers = num_hidden_layers, 
+              C_hidden = C_hidden, pool=pool).to(device)
+    file = open(save_path+'results.txt', 'w')
+    print_and_save('Network architecture: '+name, file)
+    file.close()
+    
+    print(net)
 
+    if pretrained==True:    
+        net.load_state_dict(torch.load(save_path+'trained_params.pth'))
+        train_time = None
+    else:
+        start_time = time.time()
+        train_hist, test_hist, batch_hist = train_ann(net, train_loader, test_loader, num_epochs=num_epochs, lr= lr, 
+                  weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
+                  display_iter= display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch, save_path=save_path)
+        train_time = time.time()-start_time
+        if save_path is not None:
+            torch.save(net.state_dict(), save_path+'trained_params.pth')
+    
+    # Evaluate the trained network
+    train_loss, train_acc = evaluate_ann(net, train_loader)
+    
+    start_time = time.time()
+    test_loss, test_acc = evaluate_ann(net,test_loader)
+    test_inference_time = time.time() - start_time
+    
+    print('\n ############################################')
+    file = None
+    if save_path is not None:
+        file = open(save_path+'results.txt', 'a')
+    
+    print_and_save(f'Train loss: {train_loss:.2f}, train accuracy: {train_acc*100:.2f}%', file)
+    print_and_save(f'Test loss: {test_loss:.2f}, test accuracy: {test_acc*100:.2f}%', file)
+    if pretrained == False:
+        print_and_save(f'Training time: {str(datetime.timedelta( seconds= int(train_time) ))} seconds', file)
+    else:
+        print_and_save('Training time: unknown', file)
+    print_and_save(f'Test inference time: {test_inference_time:.2f} seconds', file)
+    
+    if file is not None:
+        file.close()
+    plot_learning_curve(train_hist, test_hist, batch_hist, plot_batch= False, 
+                    eval_epoch=eval_epoch, num_epochs=num_epochs, desc = '', save_path = save_path)
+    
+    return train_loss, train_acc, test_loss, test_acc, train_time, test_inference_time
 
 
 
