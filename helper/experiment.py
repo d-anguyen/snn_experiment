@@ -204,7 +204,7 @@ def experiment_cnn(train_loader, test_loader, chw_in, n_out, C_first_hidden, num
     if pool:
         name+='-P'
     for i in range(num_hidden_layers-1):
-        name += '-' +str(C_hidden)
+        name += '-C' +str(C_hidden)
     if pool:
         name+='-P'
     name += '-' + str(n_out)+'/'
@@ -328,6 +328,11 @@ def experiment_ann(train_loader, test_loader, chw_in, n_out, n_first_hidden, num
     
     return train_loss, train_acc, test_loss, test_acc, train_time, test_inference_time
 
+
+
+
+
+#####################################################################################
 # One of the network hyperparameters will be varied from elements of a given list. 
 # Others will be given fixed. Run each experiment with that set of network hyperparams
 # a number of times and output the results. 

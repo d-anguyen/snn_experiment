@@ -37,7 +37,7 @@ list_num_hidden_layers = [i for i in range(1,7)]
 
 
 # Training hyperparameters
-num_epochs = 12
+num_epochs = 20
 lr = 1e-3
 weight_decay= 5e-4
 lr_step = num_epochs/2
@@ -48,8 +48,8 @@ lr_gamma = 0.1
 save_path = './example_results/'
 os.makedirs(save_path, exist_ok=True)
 display_iter = int((60000/batch_size) / 1) #print batch statistics 2 times per epoch
-eval_epoch = int(num_epochs / 10) #evaluate and save params after every 10-th epoch
-save_epoch = False
+eval_epoch = int(num_epochs / 10) #evaluate params after every 10-th epoch
+save_epoch = False #save params at evaluation
 
 
 
@@ -67,6 +67,6 @@ save_epoch = False
 #             output='spike', seed=None, save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=0, 
 #             lr_step=lr_step, lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=False)
 
-experiment_cnn(train_loader, test_loader, chw_in, n_out, C_first_hidden, num_binary_layers, C_hidden, pool=True,
+experiment_cnn(train_loader, test_loader, chw_in, n_out, C_first_hidden, num_hidden_layers, C_hidden, pool=True,
             seed=None, save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, 
             lr_step=lr_step, lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=False)
