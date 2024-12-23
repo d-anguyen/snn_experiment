@@ -32,12 +32,12 @@ list_num_hidden_layers = [i for i in range(1,4)]
 
 # Training hyperparameters
 pretrained = False # set True to only load and evaluate pretrained models, no training needed
-num_epochs = 200
+num_epochs = 10
 lr = 1e-3
 weight_decay= 5e-4
 lr_step = num_epochs/2
 lr_gamma = 0.1
-num_trials = 5
+num_trials = 1
 
 # Display hyperparameters
 display_iter = int((60000/batch_size) / 3) #print batch statistics 4 times per epoch
