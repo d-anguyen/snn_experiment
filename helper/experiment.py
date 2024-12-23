@@ -488,7 +488,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
                 num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
-        plot_comparison(trial_results, C_hidden, 'Width of subsequent hidden layers', path+'compare_n_hidden/')
+        plot_comparison(trial_results, C_hidden, 'Width of subsequent hidden layers', path+'compare_C_hidden/')
         with open(path + 'results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)        
     
@@ -499,7 +499,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             save_path =path+ 'compare_C_first_hidden/trial_'+str(trial+1)+'/'
             os.makedirs(save_path, exist_ok=True)
             print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
-            for val in n_first_hidden:
+            for val in C_first_hidden:
                 list_loss_acc.append(
                 experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=val, 
                 num_binary_layers=num_binary_layers, C_hidden=C_hidden, save_path=save_path, pretrained=pretrained, 
@@ -507,7 +507,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
                 
-        plot_comparison(trial_results, C_first_hidden, 'Width of the first hidden layers', path+'compare_n_first_hidden/')
+        plot_comparison(trial_results, C_first_hidden, 'Width of the first hidden layers', path+'compare_C_first_hidden/')
         with open(path + 'results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             

@@ -41,7 +41,7 @@ lr = 1e-3
 weight_decay= 5e-4
 lr_step = num_epochs/2
 lr_gamma = 0.1
-
+num_trials = 5
 
 # Display hyperparameters
 display_iter = int((60000/batch_size) / 3) #print batch statistics 4 times per epoch
@@ -51,41 +51,42 @@ save_epoch = False #choose to save the params at the evaluated epochs or not
 
 # Run different comparisons
 
-# compare_snn(dataset, batch_size=batch_size, num_steps=list_num_steps, n_first_hidden=n_first_hidden, 
-#                 num_binary_layers=num_binary_layers, n_hidden=n_hidden, output='spike',
-#                 num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
-#                 display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-#                 pretrained=False, save_path = './SNN_comparison/'+dataset+'/', num_trials=10)
+compare_snn(dataset, batch_size=batch_size, num_steps=num_steps, n_first_hidden=list_n_first_hidden, 
+                num_binary_layers=num_binary_layers, n_hidden=n_hidden, output='spike',
+                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
+                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './SNN_comparison/'+dataset+'/', num_trials=num_trials)
 
-# compare_snn(dataset, batch_size=batch_size, num_steps=num_steps, n_first_hidden=list_n_first_hidden, 
-#                 num_binary_layers=num_binary_layers, n_hidden=n_hidden, output='spike',
-#                 num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
-#                 display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-#                 pretrained=False, save_path = './SNN_comparison/'+dataset+'/', num_trials=10)
+compare_snn(dataset, batch_size=batch_size, num_steps=list_num_steps, n_first_hidden=n_first_hidden, 
+                num_binary_layers=num_binary_layers, n_hidden=n_hidden, output='spike',
+                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
+                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './SNN_comparison/'+dataset+'/', num_trials=num_trials)
 
-# compare_snn(dataset, batch_size=batch_size, num_steps=num_steps, n_first_hidden=n_first_hidden, 
-#                 num_binary_layers=list_num_binary_layers, n_hidden=n_hidden, output='spike',
-#                 num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
-#                 display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-#                 pretrained=False, save_path = './SNN_comparison/'+dataset+'/', num_trials=10)
+compare_snn(dataset, batch_size=batch_size, num_steps=num_steps, n_first_hidden=n_first_hidden, 
+                num_binary_layers=num_binary_layers, n_hidden=list_n_hidden, output='spike',
+                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
+                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './SNN_comparison/'+dataset+'/', num_trials=num_trials)
 
-# compare_snn(dataset, batch_size=batch_size, num_steps=num_steps, n_first_hidden=n_first_hidden, 
-#                 num_binary_layers=num_binary_layers, n_hidden=list_n_hidden, output='spike',
-#                 num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
-#                 display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-#                 pretrained=False, save_path = './SNN_comparison/'+dataset+'/', num_trials=10)
+compare_snn(dataset, batch_size=batch_size, num_steps=num_steps, n_first_hidden=n_first_hidden, 
+                num_binary_layers=list_num_binary_layers, n_hidden=n_hidden, output='spike',
+                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
+                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './SNN_comparison/'+dataset+'/', num_trials=num_trials)
 
-# compare_ann(dataset, batch_size=batch_size, n_first_hidden=list_n_first_hidden, num_hidden_layers=num_hidden_layers, 
-#                 n_hidden=n_hidden, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
-#                 lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-#                 pretrained=False, save_path = './ANN_comparison/'+dataset+'/', num_trials=10)
 
-# compare_ann(dataset, batch_size=batch_size, n_first_hidden=n_first_hidden, num_hidden_layers=list_num_hidden_layers, 
-#                 n_hidden=n_hidden, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
-#                 lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-#                 pretrained=False, save_path = './ANN_comparison/'+dataset+'/', num_trials=10)
+compare_ann(dataset, batch_size=batch_size, n_first_hidden=list_n_first_hidden, num_hidden_layers=num_hidden_layers, 
+                n_hidden=n_hidden, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+                lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './ANN_comparison/'+dataset+'/', num_trials=num_trials)
 
-# compare_ann(dataset, batch_size=batch_size, n_first_hidden=n_first_hidden, num_hidden_layers=num_hidden_layers, 
-#                 n_hidden=list_n_hidden, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
-#                 lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-#                 pretrained=False, save_path = './ANN_comparison/'+dataset+'/', num_trials=10)
+compare_ann(dataset, batch_size=batch_size, n_first_hidden=n_first_hidden, num_hidden_layers=list_num_hidden_layers, 
+                n_hidden=n_hidden, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+                lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './ANN_comparison/'+dataset+'/', num_trials=num_trials)
+
+compare_ann(dataset, batch_size=batch_size, n_first_hidden=n_first_hidden, num_hidden_layers=num_hidden_layers, 
+                n_hidden=list_n_hidden, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+                lr_gamma=lr_gamma, display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './ANN_comparison/'+dataset+'/', num_trials=num_trials)
