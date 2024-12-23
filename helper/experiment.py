@@ -21,7 +21,7 @@ dtype = torch.float
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 
-def load_dataset(name, batch_size=256, shuffle=True):
+def load_dataset(name, batch_size=512, shuffle=True):
     data_path = '/tmp/data/'+name  
     if name == 'mnist':
         transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
@@ -52,8 +52,8 @@ def load_dataset(name, batch_size=256, shuffle=True):
         train_set = datasets.STL10(data_path, split='train', download=True, transform=transform)
         test_set = datasets.STL10(data_path, split='test', download=True, transform=transform)
         chw_in, n_out = (3,96,96), 10
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=0)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=0)
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=16)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=16)
     
     return train_loader, test_loader, chw_in, n_out 
 
@@ -359,7 +359,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
     print_and_save(saved_args, file)
     file.close()
     
-    train_loader, test_loader, n_in, n_out = load_dataset(dataset, batch_size= batch_size)
+    train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size= batch_size)
     trial_results = []
     path = save_path
     
@@ -372,7 +372,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
             print(f'###### Experiments on number of time steps ###### Trial number {trial+1} ######')
             for val in num_steps:
                 list_loss_acc.append(
-                experiment_snn(train_loader, test_loader, n_in=n_in, n_out=n_out, num_steps=val, n_first_hidden=n_first_hidden, 
+                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=val, n_first_hidden=n_first_hidden, 
                 num_binary_layers=num_binary_layers, n_hidden=n_hidden, save_path=save_path, pretrained=False, 
                 num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )           
@@ -391,7 +391,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
             print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
             for val in n_first_hidden:
                 list_loss_acc.append(
-                experiment_snn(train_loader, test_loader, n_in=n_in, n_out=n_out, num_steps=num_steps, n_first_hidden=val, 
+                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, n_first_hidden=val, 
                 num_binary_layers=num_binary_layers, n_hidden=n_hidden, save_path=save_path, pretrained=False, 
                 num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
@@ -410,7 +410,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
             print(f'###### Experiments on number of binary layers ###### Trial number {trial+1} ######')
             for val in num_binary_layers:
                 list_loss_acc.append(
-                experiment_snn(train_loader, test_loader, n_in=n_in, n_out=n_out, num_steps=num_steps, n_first_hidden=n_first_hidden, 
+                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, n_first_hidden=n_first_hidden, 
                 num_binary_layers=val, n_hidden=n_hidden, save_path=save_path, pretrained=False, 
                 num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
@@ -428,7 +428,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
             print(f'###### Experiments on width of subsequent hidden layers ###### Trial number {trial+1} ######')
             for val in n_hidden:
                 list_loss_acc.append(
-                experiment_snn(train_loader, test_loader, n_in=n_in, n_out=n_out, num_steps=num_steps, n_first_hidden=n_first_hidden, 
+                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, n_first_hidden=n_first_hidden, 
                 num_binary_layers=num_binary_layers, n_hidden=val, save_path=save_path, pretrained=False, 
                 num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
@@ -441,7 +441,99 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
         raise ValueError("Choose to vary only 1 hyperparameter, either 'n_first_hidden', 'num_steps', 'num_binary_layers', or 'n_hidden'.")    
     
     
-
+def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden, output='spike', batch_size=256, 
+                num_epochs=200, lr=1e-3, weight_decay=0, lr_step=100, lr_gamma=0.1, display_iter =None, 
+                eval_epoch=None, save_epoch=False, pretrained=False, save_path = './CSNN_comparison/', num_trials=1):
+    
+    saved_args = {**locals()}
+    [saved_args.pop(key) for key in ['train_loader', 'test_loader']]
+    
+    file = open(save_path+'hyperparams.txt', 'w')
+    print_and_save(saved_args, file)
+    file.close()
+    
+    train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size= batch_size)
+    trial_results = []
+    path = save_path
+    
+    
+    if isinstance(num_steps, list):
+        for trial in range(num_trials):
+            # Create a list to save loss/accuracy of each experiment
+            list_loss_acc = []
+            save_path =path+ 'compare_num_steps/trial_'+str(trial+1)+'/'
+            os.makedirs(save_path, exist_ok=True)
+            print(f'###### Experiments on number of time steps ###### Trial number {trial+1} ######')
+            for val in num_steps:
+                list_loss_acc.append(
+                experiment_csnn(train_loader, test_loader, chw_in, n_out, val, C_first_hidden, num_binary_layers, 
+                C_hidden, output='spike', seed=None, save_path=save_path, pretrained=pretrained, num_epochs=num_epochs, 
+                lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, display_iter=display_iter, 
+                eval_epoch=eval_epoch, save_epoch=save_epoch) )                  
+            trial_results.append(list_loss_acc)
+        
+        plot_comparison(trial_results, num_steps, 'Number of time steps', path+'compare_num_steps/')
+        with open(path + 'results.pkl', 'wb') as f:
+            pickle.dump(trial_results, f)
+                        
+    elif isinstance(C_hidden, list):
+        for trial in range(num_trials):
+            # Create a list to save loss/accuracy of each experiment
+            list_loss_acc = []
+            save_path =path+ 'compare_n_hidden/trial_'+str(trial+1)+'/'
+            os.makedirs(save_path, exist_ok=True)
+            print(f'###### Experiments on width of subsequent hidden layers ###### Trial number {trial+1} ######')
+            for val in C_hidden:
+                list_loss_acc.append(
+                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=C_first_hidden, 
+                num_binary_layers=num_binary_layers, C_hidden=val, save_path=save_path, pretrained=pretrained, 
+                num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
+                output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
+            trial_results.append(list_loss_acc)
+        plot_comparison(trial_results, n_hidden, 'Width of subsequent hidden layers', path+'compare_n_hidden/')
+        with open(path + 'results.pkl', 'wb') as f:
+            pickle.dump(trial_results, f)        
+    
+    elif isinstance(C_first_hidden, list):
+        for trial in range(num_trials):
+            # Create a list to save loss/accuracy of each experiment
+            list_loss_acc = []
+            save_path =path+ 'compare_C_first_hidden/trial_'+str(trial+1)+'/'
+            os.makedirs(save_path, exist_ok=True)
+            print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
+            for val in n_first_hidden:
+                list_loss_acc.append(
+                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=val, 
+                num_binary_layers=num_binary_layers, C_hidden=C_hidden, save_path=save_path, pretrained=pretrained, 
+                num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
+                output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
+            trial_results.append(list_loss_acc)
+                
+        plot_comparison(trial_results, n_first_hidden, 'Width of the first hidden layers', path+'compare_n_first_hidden/')
+        with open(path + 'results.pkl', 'wb') as f:
+            pickle.dump(trial_results, f)
+            
+    elif isinstance(num_binary_layers, list):
+        for trial in range(num_trials):
+            # Create a list to save loss/accuracy of each experiment
+            list_loss_acc = []
+            save_path =path+ 'compare_num_binary_layers/trial_'+str(trial+1)+'/'
+            os.makedirs(save_path, exist_ok=True)
+            print(f'###### Experiments on number of binary layers ###### Trial number {trial+1} ######')
+            for val in num_binary_layers:
+                list_loss_acc.append(
+                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=C_first_hidden, 
+                num_binary_layers=val, C_hidden=C_hidden, save_path=save_path, pretrained=pretrained, 
+                num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
+                output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
+            trial_results.append(list_loss_acc)
+        plot_comparison(trial_results, num_binary_layers, 'Number of binary layers', path+'compare_num_binary_layers/')
+        with open(path + 'results.pkl', 'wb') as f:
+            pickle.dump(trial_results, f)
+                     
+    else:
+        raise ValueError("Choose to vary only 1 hyperparameter, either 'C_first_hidden', 'num_steps', 'num_binary_layers', or 'C_hidden'.")    
+    
 #############################################################
 def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size=256, num_epochs=200, lr=1e-3, 
                 weight_decay=0, lr_step=100, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False,
@@ -454,7 +546,7 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
     print_and_save(saved_args, file)
     file.close()
     
-    train_loader, test_loader, n_in, n_out = load_dataset(dataset, batch_size= batch_size) 
+    train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size= batch_size) 
     trial_results = []
     path = save_path
     
@@ -468,8 +560,8 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
             print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
             for val in n_first_hidden:
                 list_loss_acc.append(
-                experiment_ann(train_loader, test_loader, n_in = n_in, n_out=n_out, n_first_hidden=val, num_hidden_layers=num_hidden_layers,
-                n_hidden=n_hidden, save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+                experiment_ann(train_loader, test_loader, chw_in = chw_in, n_out=n_out, n_first_hidden=val, num_hidden_layers=num_hidden_layers,
+                n_hidden=n_hidden, save_path=save_path, pretrained=pretrained, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
                 lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, n_first_hidden, 'Width of the first hidden layers', path+'compare_n_first_hidden/')
@@ -485,8 +577,8 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
             print(f'###### Experiments on number of hidden layers ###### Trial number {trial+1} ######')
             for val in num_hidden_layers:
                 list_loss_acc.append(
-                experiment_ann(train_loader, test_loader, n_in=n_in, n_out=n_out, n_first_hidden=n_first_hidden, num_hidden_layers=val, 
-                n_hidden=n_hidden, save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, 
+                experiment_ann(train_loader, test_loader, chw_in=chw_in, n_out=n_out, n_first_hidden=n_first_hidden, num_hidden_layers=val, 
+                n_hidden=n_hidden, save_path=save_path, pretrained=pretrained, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, 
                 lr_step=lr_step, lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, num_binary_layers, 'Number of hidden layers', path+'compare_num_binary_layers/')
@@ -502,8 +594,8 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
             print(f'###### Experiments on width of subsequent hidden layers ###### Trial number {trial+1} ######')
             for val in n_hidden:
                 list_loss_acc.append(
-                experiment_ann(train_loader, test_loader, n_in=n_in, n_out=n_out, n_first_hidden=n_first_hidden, num_hidden_layers=num_hidden_layers, 
-                n_hidden=val, save_path=save_path, pretrained=False, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+                experiment_ann(train_loader, test_loader, chw_in=chw_in, n_out=n_out, n_first_hidden=n_first_hidden, num_hidden_layers=num_hidden_layers, 
+                n_hidden=val, save_path=save_path, pretrained=pretrained, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
                 lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, n_hidden, 'Width of subsequent hidden layers', path+'compare_n_hidden/')
@@ -512,5 +604,75 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
             
     else:
         raise ValueError("Choose only one hyperparameter to change, either 'n_first_hidden', 'num_hidden_layers', or 'n_hidden'.")    
+    
+def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size=512, num_epochs=200, lr=1e-3, 
+                weight_decay=0, lr_step=100, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False,
+                pretrained=False, save_path = './CNN_comparison/', num_trials=1):
+    
+    saved_args = {**locals()}
+    [saved_args.pop(key) for key in ['train_loader', 'test_loader']]
+    
+    file = open(save_path+'hyperparams.txt', 'w')
+    print_and_save(saved_args, file)
+    file.close()
+    
+    train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size= batch_size) 
+    trial_results = []
+    path = save_path
+    
+
+    if isinstance(C_first_hidden, list):
+        for trial in range(num_trials):
+            # Create a list to save loss/accuracy of each experiment
+            list_loss_acc = []
+            save_path =path+ 'compare_n_first_hidden/trial'+str(trial+1)+'/'
+            os.makedirs(save_path, exist_ok=True)
+            print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
+            for val in C_first_hidden:
+                list_loss_acc.append(
+                experiment_cnn(train_loader, test_loader, chw_in = chw_in, n_out=n_out, C_first_hidden=val, num_hidden_layers=num_hidden_layers,
+                C_hidden=C_hidden, save_path=save_path, pretrained=pretrained, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+                lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
+            trial_results.append(list_loss_acc)
+        plot_comparison(trial_results, n_first_hidden, 'Width of the first hidden layers', path+'compare_n_first_hidden/')
+        with open(path + 'results.pkl', 'wb') as f:
+            pickle.dump(trial_results, f)
+            
+    elif isinstance(num_hidden_layers, list):
+        for trial in range(num_trials):
+            # Create a list to save loss/accuracy of each experiment
+            list_loss_acc = []
+            save_path =path+ 'compare_num_hidden_layers/trial_'+str(trial+1)+'/'
+            os.makedirs(save_path, exist_ok=True)
+            print(f'###### Experiments on number of hidden layers ###### Trial number {trial+1} ######')
+            for val in num_hidden_layers:
+                list_loss_acc.append(
+                experiment_cnn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, C_first_hidden=C_first_hidden, num_hidden_layers=val, 
+                C_hidden=C_hidden, save_path=save_path, pretrained=pretrained, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, 
+                lr_step=lr_step, lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
+            trial_results.append(list_loss_acc)
+        plot_comparison(trial_results, num_binary_layers, 'Number of hidden layers', path+'compare_num_binary_layers/')
+        with open(path + 'results.pkl', 'wb') as f:
+            pickle.dump(trial_results, f)
+            
+    elif isinstance(C_hidden, list):
+        for trial in range(num_trials):
+            # Create a list to save loss/accuracy of each experiment
+            list_loss_acc = []
+            save_path =path+ 'compare_n_hidden/trial_'+str(trial+1)+'/'
+            os.makedirs(save_path, exist_ok=True)
+            print(f'###### Experiments on width of subsequent hidden layers ###### Trial number {trial+1} ######')
+            for val in C_hidden:
+                list_loss_acc.append(
+                experiment_cnn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, C_first_hidden=C_first_hidden, num_hidden_layers=num_hidden_layers, 
+                C_hidden=val, save_path=save_path, pretrained=pretrained, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+                lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
+            trial_results.append(list_loss_acc)
+        plot_comparison(trial_results, n_hidden, 'Width of subsequent hidden layers', path+'compare_n_hidden/')
+        with open(path + 'results.pkl', 'wb') as f:
+            pickle.dump(trial_results, f)
+            
+    else:
+        raise ValueError("Choose only one hyperparameter to change, either 'C_first_hidden', 'num_hidden_layers', or 'C_hidden'.")    
     
 
