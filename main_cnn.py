@@ -47,14 +47,22 @@ save_epoch = False #choose to save the params at the evaluated epochs or not
 
 # Run different comparisons
 
+
+
+compare_csnn(dataset, batch_size=batch_size, num_steps=num_steps, C_first_hidden=list_C_first_hidden, 
+                num_binary_layers=num_binary_layers, C_hidden=C_hidden, output='spike',
+                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
+                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
+                pretrained=False, save_path = './CSNN_comparison/'+dataset+'/', num_trials=5)
+
 compare_csnn(dataset, batch_size=batch_size, num_steps=list_num_steps, C_first_hidden=C_first_hidden, 
                 num_binary_layers=num_binary_layers, C_hidden=C_hidden, output='spike',
                 num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
                 display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
                 pretrained=False, save_path = './CSNN_comparison/'+dataset+'/', num_trials=5)
 
-compare_csnn(dataset, batch_size=batch_size, num_steps=num_steps, C_first_hidden=list_C_first_hidden, 
-                num_binary_layers=num_binary_layers, C_hidden=C_hidden, output='spike',
+compare_csnn(dataset, batch_size=batch_size, num_steps=num_steps, C_first_hidden=C_first_hidden, 
+                num_binary_layers=num_binary_layers, n_hidden=list_C_hidden, output='spike',
                 num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
                 display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
                 pretrained=False, save_path = './CSNN_comparison/'+dataset+'/', num_trials=5)
@@ -65,11 +73,6 @@ compare_csnn(dataset, batch_size=batch_size, num_steps=num_steps, C_first_hidden
                 display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
                 pretrained=False, save_path = './CSNN_comparison/'+dataset+'/', num_trials=5)
 
-compare_csnn(dataset, batch_size=batch_size, num_steps=num_steps, C_first_hidden=C_first_hidden, 
-                num_binary_layers=num_binary_layers, n_hidden=list_C_hidden, output='spike',
-                num_epochs=num_epochs, lr=lr, weight_decay=0, lr_step=lr_step, lr_gamma=lr_gamma,
-                display_iter =display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch,
-                pretrained=False, save_path = './CSNN_comparison/'+dataset+'/', num_trials=5)
 
 compare_cnn(dataset, batch_size=batch_size, C_first_hidden=list_C_first_hidden, num_hidden_layers=num_hidden_layers, 
                 C_hidden=C_hidden, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 

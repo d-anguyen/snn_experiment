@@ -353,6 +353,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
                 eval_epoch=None, save_epoch=False, pretrained=False, save_path = './SNN_comparison/', num_trials=1):
     
     saved_args = {**locals()}
+    os.makedirs(save_path, exist_ok=True)
     file = open(save_path+'hyperparams.txt', 'w')
     print_and_save(saved_args, file)
     file.close()
@@ -444,6 +445,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
                 eval_epoch=None, save_epoch=False, pretrained=False, save_path = './CSNN_comparison/', num_trials=1):
     
     saved_args = {**locals()}
+    os.makedirs(save_path, exist_ok=True)
     file = open(save_path+'hyperparams.txt', 'w')
     print_and_save(saved_args, file)
     file.close()
@@ -536,7 +538,7 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
                 pretrained=False, save_path = './ANN_comparison/', num_trials=1):
     
     saved_args = {**locals()}
-    
+    os.makedirs(save_path, exist_ok=True)
     file = open(save_path+'hyperparams.txt', 'w')
     print_and_save(saved_args, file)
     file.close()
@@ -605,7 +607,7 @@ def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size
                 pretrained=False, save_path = './CNN_comparison/', num_trials=1):
     
     saved_args = {**locals()}
-    
+    os.makedirs(save_path, exist_ok=True)
     file = open(save_path+'hyperparams.txt', 'w')
     print_and_save(saved_args, file)
     file.close()
