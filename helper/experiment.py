@@ -463,11 +463,11 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             os.makedirs(save_path, exist_ok=True)
             print(f'###### Experiments on number of time steps ###### Trial number {trial+1} ######')
             for val in num_steps:
-                list_loss_acc.append(
-                experiment_csnn(train_loader, test_loader, chw_in, n_out, val, C_first_hidden, num_binary_layers, 
-                C_hidden, output='spike', seed=None, save_path=save_path, pretrained=pretrained, num_epochs=num_epochs, 
-                lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, display_iter=display_iter, 
-                eval_epoch=eval_epoch, save_epoch=save_epoch) )                  
+                list_loss_acc.append( 
+                    experiment_csnn(train_loader, test_loader, chw_in, n_out, num_steps=val, C_first_hidden=C_first_hidden, 
+                    num_binary_layers=num_binary_layers, C_hidden=C_hidden, output='spike', seed=None, save_path=None, 
+                    pretrained=False, num_epochs=200, lr=1e-3, weight_decay=0, lr_step=50, lr_gamma=0.1, display_iter =None, 
+                    eval_epoch=None, save_epoch=False) )                  
             trial_results.append(list_loss_acc)
         
         plot_comparison(trial_results, num_steps, 'Number of time steps', path+'compare_num_steps/')
@@ -483,7 +483,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             print(f'###### Experiments on width of subsequent hidden layers ###### Trial number {trial+1} ######')
             for val in C_hidden:
                 list_loss_acc.append(
-                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=C_first_hidden, 
+                experiment_csnn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=C_first_hidden, 
                 num_binary_layers=num_binary_layers, C_hidden=val, save_path=save_path, pretrained=pretrained, 
                 num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
@@ -501,7 +501,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
             for val in C_first_hidden:
                 list_loss_acc.append(
-                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=val, 
+                experiment_csnn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=val, 
                 num_binary_layers=num_binary_layers, C_hidden=C_hidden, save_path=save_path, pretrained=pretrained, 
                 num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
@@ -520,7 +520,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             print(f'###### Experiments on number of binary layers ###### Trial number {trial+1} ######')
             for val in num_binary_layers:
                 list_loss_acc.append(
-                experiment_snn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=C_first_hidden, 
+                experiment_csnn(train_loader, test_loader, chw_in=chw_in, n_out=n_out, num_steps=num_steps, C_first_hidden=C_first_hidden, 
                 num_binary_layers=val, C_hidden=C_hidden, save_path=save_path, pretrained=pretrained, 
                 num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, lr_gamma=lr_gamma, 
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
