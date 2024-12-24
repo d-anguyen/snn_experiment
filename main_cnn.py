@@ -22,11 +22,11 @@ num_binary_layers = 4
 C_hidden = 3
 num_hidden_layers = num_binary_layers-1
 
-list_C_first_hidden = [i for i in range(1,7)]
-list_num_binary_layers = [i for i in range(2,6)]
-list_C_hidden = [i for i in range(1,7)]
-list_num_steps = [2*i for i in range(1,7)] 
-list_num_hidden_layers = [i for i in range(1,4)]
+list_C_first_hidden = [i for i in range(1,3)]
+list_num_binary_layers = [i for i in range(2,4)]
+list_C_hidden = [i for i in range(1,3)]
+list_num_steps = [2*i for i in range(1,3)] 
+list_num_hidden_layers = [i for i in range(1,3)]
 
 
 
