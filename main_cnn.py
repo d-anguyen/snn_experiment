@@ -16,7 +16,7 @@ dataset = 'cifar10' # choose 'mnist', 'cifar10', 'fashion_mnist', 'svhn' , 'stl1
 
 
 # Define the network dimensions
-num_steps = 8
+num_steps = 2
 C_first_hidden = 3
 num_binary_layers = 4
 C_hidden = 3
@@ -32,7 +32,7 @@ list_num_hidden_layers = [i for i in range(1,4)]
 
 # Training hyperparameters
 pretrained = False # set True to only load and evaluate pretrained models, no training needed
-num_epochs = 10
+num_epochs = 4
 lr = 1e-3
 weight_decay= 5e-4
 lr_step = num_epochs/2
