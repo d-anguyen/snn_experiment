@@ -378,7 +378,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
                 trial_results.append(list_loss_acc)
         
         plot_comparison(trial_results, num_steps, 'Number of time steps', path+'compare_num_steps/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_num_steps/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(n_first_hidden, list):
@@ -397,7 +397,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
             trial_results.append(list_loss_acc)
                 
         plot_comparison(trial_results, n_first_hidden, 'Width of the first hidden layers', path+'compare_n_first_hidden/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_n_first_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(num_binary_layers, list):
@@ -415,7 +415,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, num_binary_layers, 'Number of binary layers', path+'compare_num_binary_layers/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_num_binary_layers/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(n_hidden, list):
@@ -433,7 +433,7 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, n_hidden, 'Width of subsequent hidden layers', path+'compare_n_hidden/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_n_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     else:
@@ -471,14 +471,14 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             trial_results.append(list_loss_acc)
         
         plot_comparison(trial_results, num_steps, 'Number of time steps', path+'compare_num_steps/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_num_steps/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
                         
     elif isinstance(C_hidden, list):
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
-            save_path =path+ 'compare_n_hidden/trial_'+str(trial+1)+'/'
+            save_path =path+ 'compare_C_hidden/trial_'+str(trial+1)+'/'
             os.makedirs(save_path, exist_ok=True)
             print(f'###### Experiments on number of channels in subsequent hidden layers ###### Trial number {trial+1} ######')
             for val in C_hidden:
@@ -489,7 +489,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, C_hidden, 'Number of channels in subsequent hidden layers', path+'compare_C_hidden/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_C_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)        
     
     elif isinstance(C_first_hidden, list):
@@ -508,7 +508,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             trial_results.append(list_loss_acc)
                 
         plot_comparison(trial_results, C_first_hidden, 'Number of channels in the first hidden layers', path+'compare_C_first_hidden/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_C_first_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(num_binary_layers, list):
@@ -526,7 +526,7 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
                 output=output, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, num_binary_layers, 'Number of binary layers', path+'compare_num_binary_layers/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_num_binary_layers/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
                      
     else:
@@ -562,7 +562,7 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
                 lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, n_first_hidden, 'Width of the first hidden layers', path+'compare_n_first_hidden/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_n_first_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(num_hidden_layers, list):
@@ -579,7 +579,7 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
                 lr_step=lr_step, lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, num_hidden_layers, 'Number of hidden layers', path+'compare_num_binary_layers/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_num_hidden_layers/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(n_hidden, list):
@@ -596,7 +596,7 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
                 lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, n_hidden, 'Width of subsequent hidden layers', path+'compare_n_hidden/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_n_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     else:
@@ -631,7 +631,7 @@ def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size
                 lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, C_first_hidden, 'Width of the first hidden layers', path+'compare_C_first_hidden/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_C_first_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(num_hidden_layers, list):
@@ -648,7 +648,7 @@ def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size
                 lr_step=lr_step, lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, num_hidden_layers, 'Number of hidden layers', path+'compare_num_hidden_layers/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_num_hidden_layers/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(C_hidden, list):
@@ -665,7 +665,7 @@ def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size
                 lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )
             trial_results.append(list_loss_acc)
         plot_comparison(trial_results, C_hidden, 'Width of subsequent hidden layers', path+'compare_C_hidden/')
-        with open(path + 'results.pkl', 'wb') as f:
+        with open(path + 'compare_C_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     else:
