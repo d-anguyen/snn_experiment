@@ -41,7 +41,7 @@ num_trials = 1
 
 # Display hyperparameters
 display_iter = int((60000/batch_size) / 3) #print batch statistics 4 times per epoch
-eval_epoch = int(num_epochs / 20) #evaluate and save params after every 20-th epoch
+eval_epoch = int(num_epochs / 10) #evaluate and save params after every 20-th epoch
 save_epoch = False #choose to save the params at the evaluated epochs or not
 
 

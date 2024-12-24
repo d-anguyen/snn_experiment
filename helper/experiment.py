@@ -209,7 +209,7 @@ def experiment_cnn(train_loader, test_loader, chw_in, n_out, C_first_hidden, num
     [saved_args.pop(key) for key in ['train_loader', 'test_loader']]
     n_in = chw_in[0]*chw_in[1]*chw_in[2]
     # Create a folder to save the results
-    name = 'ANN_'+str(chw_in[0])+ '-C' + str(C_first_hidden)
+    name = 'CNN_'+str(chw_in[0])+ '-C' + str(C_first_hidden)
     if pool:
         name+='-P'
     for i in range(num_hidden_layers-1):
