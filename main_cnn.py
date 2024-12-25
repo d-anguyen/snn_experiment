@@ -11,33 +11,33 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 # Prepare dataset
 batch_size = 512
-dataset = 'cifar10' # choose 'mnist', 'cifar10', 'fashion_mnist', 'svhn' , 'stl10'
+dataset = 'mnist' # choose 'mnist', 'cifar10', 'fashion_mnist', 'svhn' , 'stl10'
 
 
 
 # Define the network dimensions
 num_steps = 2
-C_first_hidden = 3
-num_binary_layers = 4
-C_hidden = 3
+C_first_hidden = 2
+num_binary_layers = 3
+C_hidden = 2
 num_hidden_layers = num_binary_layers-1
 
-list_C_first_hidden = [i for i in range(1,3)]
-list_num_binary_layers = [i for i in range(2,4)]
-list_C_hidden = [i for i in range(1,3)]
-list_num_steps = [2*i for i in range(1,3)] 
-list_num_hidden_layers = [i for i in range(1,3)]
+list_C_first_hidden = [i for i in range(1,6)]
+list_num_binary_layers = [i for i in range(2,7)]
+list_C_hidden = [i for i in range(1,6)]
+list_num_steps = [2*i for i in range(1,9)] 
+list_num_hidden_layers = [i for i in range(1,6)]
 
 
 
 # Training hyperparameters
 pretrained = False # set True to only load and evaluate pretrained models, no training needed
-num_epochs = 4
+num_epochs = 200
 lr = 1e-3
 weight_decay= 5e-4
 lr_step = num_epochs/2
 lr_gamma = 0.1
-num_trials = 1
+num_trials = 5
 
 # Display hyperparameters
 display_iter = int((60000/batch_size) / 3) #print batch statistics 4 times per epoch

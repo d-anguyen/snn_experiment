@@ -207,7 +207,7 @@ def experiment_cnn(train_loader, test_loader, chw_in, n_out, C_first_hidden, num
             lr_step=50, lr_gamma=0.1, display_iter =None, eval_epoch=None, save_epoch=False):    
     saved_args = {**locals()}
     [saved_args.pop(key) for key in ['train_loader', 'test_loader']]
-    n_in = chw_in[0]*chw_in[1]*chw_in[2]
+    
     # Create a folder to save the results
     name = 'CNN_'+str(chw_in[0])+ '-C' + str(C_first_hidden)
     if pool:
@@ -353,20 +353,22 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
                 eval_epoch=None, save_epoch=False, pretrained=False, save_path = './SNN_comparison/', num_trials=1):
     
     saved_args = {**locals()}
-    os.makedirs(save_path, exist_ok=True)
-    file = open(save_path+'hyperparams.txt', 'w')
-    print_and_save(saved_args, file)
-    file.close()
-    
+        
     train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size= batch_size)
     trial_results = []
     path = save_path
     
     if isinstance(num_steps, list):
+        save_path = path+'compare_num_steps/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
-            save_path =path+ 'compare_num_steps/trial_'+str(trial+1)+'/'
+            save_path =path+'compare_num_steps/trial_'+str(trial+1)+'/'
             os.makedirs(save_path, exist_ok=True)
             print(f'###### Experiments on number of time steps ###### Trial number {trial+1} ######')
             for val in num_steps:
@@ -378,14 +380,20 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
                 trial_results.append(list_loss_acc)
         
         plot_comparison(trial_results, num_steps, 'Number of time steps', path+'compare_num_steps/')
-        with open(path + 'compare_num_steps/results.pkl', 'wb') as f:
+        with open(path+'compare_num_steps/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(n_first_hidden, list):
+        save_path = path+'compare_n_first_hidden/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
-            list_loss_acc = []
-            save_path =path+ 'compare_n_first_hidden/trial_'+str(trial+1)+'/'
+            list_loss_acc = []            
+            save_path =path+'compare_n_first_hidden/trial_'+str(trial+1)+'/'
             os.makedirs(save_path, exist_ok=True)
             print(f'###### Experiments on width of first hidden layer ###### Trial number {trial+1} ######')
             for val in n_first_hidden:
@@ -397,10 +405,16 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
             trial_results.append(list_loss_acc)
                 
         plot_comparison(trial_results, n_first_hidden, 'Width of the first hidden layers', path+'compare_n_first_hidden/')
-        with open(path + 'compare_n_first_hidden/results.pkl', 'wb') as f:
+        with open(path+'compare_n_first_hidden/results.pkl', 'wb') as f:
             pickle.dump(trial_results, f)
             
     elif isinstance(num_binary_layers, list):
+        save_path = path+'compare_num_binary_layers/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -419,6 +433,12 @@ def compare_snn(dataset, num_steps, n_first_hidden, num_binary_layers, n_hidden,
             pickle.dump(trial_results, f)
             
     elif isinstance(n_hidden, list):
+        save_path = path+'compare_n_hidden/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -445,17 +465,18 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
                 eval_epoch=None, save_epoch=False, pretrained=False, save_path = './CSNN_comparison/', num_trials=1):
     
     saved_args = {**locals()}
-    os.makedirs(save_path, exist_ok=True)
-    file = open(save_path+'hyperparams.txt', 'w')
-    print_and_save(saved_args, file)
-    file.close()
-    
     train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size= batch_size)
     trial_results = []
     path = save_path
     
     
     if isinstance(num_steps, list):
+        save_path = path+'compare_num_steps/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -475,6 +496,12 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             pickle.dump(trial_results, f)
                         
     elif isinstance(C_hidden, list):
+        save_path = path+'compare_C_hidden/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -493,6 +520,12 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             pickle.dump(trial_results, f)        
     
     elif isinstance(C_first_hidden, list):
+        save_path = path+'compare_C_first_hidden/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -512,6 +545,12 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             pickle.dump(trial_results, f)
             
     elif isinstance(num_binary_layers, list):
+        save_path = path+'compare_num_binary_layers/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -538,10 +577,6 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
                 pretrained=False, save_path = './ANN_comparison/', num_trials=1):
     
     saved_args = {**locals()}
-    os.makedirs(save_path, exist_ok=True)
-    file = open(save_path+'hyperparams.txt', 'w')
-    print_and_save(saved_args, file)
-    file.close()
     
     train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size= batch_size) 
     trial_results = []
@@ -549,6 +584,12 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
     
 
     if isinstance(n_first_hidden, list):
+        save_path = path+'compare_n_first_hidden/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -566,6 +607,12 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
             pickle.dump(trial_results, f)
             
     elif isinstance(num_hidden_layers, list):
+        save_path = path+'compare_num_hidden_layers/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -583,6 +630,12 @@ def compare_ann(dataset, n_first_hidden, num_hidden_layers, n_hidden, batch_size
             pickle.dump(trial_results, f)
             
     elif isinstance(n_hidden, list):
+        save_path = path+'compare_n_hidden/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -607,10 +660,6 @@ def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size
                 pretrained=False, save_path = './CNN_comparison/', num_trials=1):
     
     saved_args = {**locals()}
-    os.makedirs(save_path, exist_ok=True)
-    file = open(save_path+'hyperparams.txt', 'w')
-    print_and_save(saved_args, file)
-    file.close()
     
     train_loader, test_loader, chw_in, n_out = load_dataset(dataset, batch_size= batch_size) 
     trial_results = []
@@ -618,6 +667,12 @@ def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size
     
 
     if isinstance(C_first_hidden, list):
+        save_path = path+'compare_C_first_hidden/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -635,6 +690,12 @@ def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size
             pickle.dump(trial_results, f)
             
     elif isinstance(num_hidden_layers, list):
+        save_path = path+'compare_num_hidden_layers/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
@@ -652,6 +713,12 @@ def compare_cnn(dataset, C_first_hidden, num_hidden_layers, C_hidden, batch_size
             pickle.dump(trial_results, f)
             
     elif isinstance(C_hidden, list):
+        save_path = path+'compare_C_hidden/'
+        os.makedirs(save_path, exist_ok=True)
+        file = open(save_path+'hyperparams.txt', 'w')
+        print_and_save(saved_args, file)
+        file.close()
+        
         for trial in range(num_trials):
             # Create a list to save loss/accuracy of each experiment
             list_loss_acc = []
