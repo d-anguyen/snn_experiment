@@ -52,8 +52,8 @@ def load_dataset(name, batch_size=512, shuffle=True):
         train_set = datasets.STL10(data_path, split='train', download=True, transform=transform)
         test_set = datasets.STL10(data_path, split='test', download=True, transform=transform)
         chw_in, n_out = (3,96,96), 10
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=16)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=16)
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, num_workers=4)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=shuffle, num_workers=4)
     
     return train_loader, test_loader, chw_in, n_out 
 
