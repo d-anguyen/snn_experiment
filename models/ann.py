@@ -29,7 +29,6 @@ class CNN(nn.Module):
     def __init__(self, chw_in, n_out, C_first_hidden, num_hidden_layers, C_hidden, pool = False):
         super().__init__()  
         wh = chw_in[1]*chw_in[2]
-        print(wh)
         
         layers = [nn.Conv2d(in_channels=chw_in[0], out_channels=C_first_hidden, kernel_size=3, stride=1, padding=1), nn.ReLU()]
         if pool:
