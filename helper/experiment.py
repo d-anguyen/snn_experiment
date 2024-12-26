@@ -486,9 +486,9 @@ def compare_csnn(dataset, num_steps, C_first_hidden, num_binary_layers, C_hidden
             for val in num_steps:
                 list_loss_acc.append( 
                     experiment_csnn(train_loader, test_loader, chw_in, n_out, num_steps=val, C_first_hidden=C_first_hidden, 
-                    num_binary_layers=num_binary_layers, C_hidden=C_hidden, output='spike', seed=None, save_path=None, 
-                    pretrained=False, num_epochs=200, lr=1e-3, weight_decay=0, lr_step=50, lr_gamma=0.1, display_iter =None, 
-                    eval_epoch=None, save_epoch=False) )                  
+                    num_binary_layers=num_binary_layers, C_hidden=C_hidden, output=output, save_path=save_path, 
+                    pretrained=pretrained, num_epochs=num_epochs, lr=lr, weight_decay=weight_decay, lr_step=lr_step, 
+                    lr_gamma=lr_gamma, display_iter=display_iter, eval_epoch=eval_epoch, save_epoch=save_epoch) )                  
             trial_results.append(list_loss_acc)
         
         plot_comparison(trial_results, num_steps, 'Number of time steps', path+'compare_num_steps/')
